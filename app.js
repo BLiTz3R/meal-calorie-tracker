@@ -183,7 +183,6 @@ const UICtrl = (function() {
         itemCaloriesInput: '#item-calories',
         totalCalories: '.total-calories'
     };
-
         // Public methods
         return {
             populateItemList: function(items) {
@@ -357,7 +356,6 @@ const App = (function(ItemCtrl, StorageCtrl, UICtrl) {
             // Clear input fields
             UICtrl.clearInput();
         }
-
         e.preventDefault();
     };
 
@@ -381,7 +379,6 @@ const App = (function(ItemCtrl, StorageCtrl, UICtrl) {
 
             // Add item to form
             UICtrl.addItemToForm();
-
         }
         e.preventDefault();
     };
@@ -455,7 +452,7 @@ const App = (function(ItemCtrl, StorageCtrl, UICtrl) {
 
         // Hide UL
         UICtrl.hideList();
-    }
+    };
 
     // Public methods
     return {
