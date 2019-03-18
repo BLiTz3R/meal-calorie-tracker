@@ -1,4 +1,69 @@
 // Storage controller
+const StorageCtrl = (function() {
+    // Public methods
+    return {
+        storeItem: function(item) {
+            let items;
+            // Check if any items in localStorage
+            if (localStorage.getItem('items') === null) {
+                items = [];
+
+                // Push new item
+                items.push(item);
+
+                // Set localStorage
+                localStorage.setItem('items', JSON.stringify(items));
+            } else {
+                // Get what is already in localStorage
+                items = JSON.parse(localStorage.getItem('items'));
+
+                // Push new item
+                items.push(item);
+
+                // Re-set localStorage
+                localStorage.setItem('items', JSON.stringify(items));
+            }
+        },
+        getItemsFromStorage: function() {
+            let items;
+            if (localStorage.getItem('items') === null) {
+                items = [];
+            } else {
+                items = JSON.parse(localStorage.getItem('items'));
+            }
+            return items;
+        },
+        updateItemStorage: function(updatedItem) {
+            let items = JSON.parse(localStorage.getItem('items'));
+
+            items.forEach(function(item, index) {
+                if (updatedItem.id === item.id) {
+                    // Replace item with updated item
+                    items.splice(index, 1, updatedItem);
+                }
+            });
+
+            // Re-set localStorage
+            localStorage.setItem('items', JSON.stringify(items));
+        },
+        deleteItemFromStorage: function(id) {
+            let items = JSON.parse(localStorage.getItem('items'));
+
+            items.forEach(function(item, index) {
+                if (id === item.id) {
+                    // Delete item
+                    items.splice(index, 1);
+                }
+            });
+
+            // Re-set localStorage
+            localStorage.setItem('items', JSON.stringify(items));
+        },
+        clearAllFromStorage: function() {
+            localStorage.removeItem('items');
+        }
+    }
+})();
 
 // Item controller
 const ItemCtrl = (function() {
@@ -11,7 +76,7 @@ const ItemCtrl = (function() {
 
     // Data structure / State
     const data = {
-        items: [],
+        items: StorageCtrl.getItemsFromStorage(),
         currentItem: null,
         totalCalories: 0
     };
@@ -234,7 +299,7 @@ const UICtrl = (function() {
 })();
 
 // App controller
-const App = (function(ItemCtrl, UICtrl) {
+const App = (function(ItemCtrl, StorageCtrl, UICtrl) {
     // Load event listeners
     const loadEventListeners = function() {
         // Get UI Selectors
@@ -286,6 +351,9 @@ const App = (function(ItemCtrl, UICtrl) {
             // Add total calories to UI
             UICtrl.showTotalCalories(totalCalories);
 
+            // Store in localStorage
+            StorageCtrl.storeItem(newItem);
+
             // Clear input fields
             UICtrl.clearInput();
         }
@@ -335,6 +403,9 @@ const App = (function(ItemCtrl, UICtrl) {
         // Add total calories to UI
         UICtrl.showTotalCalories(totalCalories);
 
+        // Update localStorage
+        StorageCtrl.updateItemStorage(updatedItem);
+
         UICtrl.clearEditState();
 
         e.preventDefault();
@@ -356,6 +427,9 @@ const App = (function(ItemCtrl, UICtrl) {
 
             // Add total calories to UI
             UICtrl.showTotalCalories(totalCalories);
+
+            // Delete from localStorage
+            StorageCtrl.deleteItemFromStorage(currentItem.id);
     
             UICtrl.clearEditState();
         
@@ -375,6 +449,9 @@ const App = (function(ItemCtrl, UICtrl) {
 
         // Remove from UI
         UICtrl.removeAllItems();
+
+        // Clear from localStorage
+        StorageCtrl.clearAllFromStorage();
 
         // Hide UL
         UICtrl.hideList();
@@ -408,7 +485,7 @@ const App = (function(ItemCtrl, UICtrl) {
         }
     };
     
-})(ItemCtrl, UICtrl);
+})(ItemCtrl, StorageCtrl, UICtrl);
 
 // Initialize app
 App.init();
